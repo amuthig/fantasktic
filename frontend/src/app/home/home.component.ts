@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import { KanbanComponent } from '../kanban/kanban.component';
 
 @Component({
   selector: 'app-home',
-  imports: [],
+  imports: [KanbanComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })

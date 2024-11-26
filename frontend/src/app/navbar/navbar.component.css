@@ -1,0 +1,50 @@
+/* Styles de la Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    padding: 0; /* Pas de padding pour aligner les boutons avec la hauteur */
+    height: 64px; /* Hauteur totale de la navbar */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Ombre discrète */
+  }
+  
+  /* Logo à gauche */
+  .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #5f6368; /* Gris Google */
+    padding: 0 16px; /* Espacement pour le logo */
+    line-height: 64px; /* Centrage vertical */
+  }
+  
+  /* Espacement flexible */
+  .spacer {
+    flex: 1;
+  }
+  
+  /* Boutons sans bordures */
+  .nav-item {
+    border: none; /* Supprime l'encadrement */
+    height: 100%; /* Hauteur du bouton = hauteur de la navbar */
+    font-size: 1rem; /* Taille moyenne */
+    color: #5f6368; /* Couleur grise par défaut */
+    background: none; /* Pas de fond par défaut */
+    text-transform: none; /* Pas de majuscules automatiques */
+    transition: background-color 0.3s, color 0.3s; /* Transition douce */
+    padding: 0 16px; /* Espacement horizontal pour chaque bouton */
+    display: flex;
+    align-items: center; /* Centrage vertical du texte */
+  }
+  
+  /* Effets de survol */
+  .nav-item:hover {
+    color: #1a73e8; /* Texte bleu */
+    background-color: rgba(26, 115, 232, 0.1); /* Fond bleu clair */
+  }
+  
+  /* Boutons pleine hauteur (Projets et Login/Logout) */
+  .nav-full {
+    line-height: normal;
+  }
+  

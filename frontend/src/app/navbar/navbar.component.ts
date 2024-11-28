@@ -1,20 +1,30 @@
 import { Component } from '@angular/core';
-import {MatMenuModule} from '@angular/material/menu';
-import {MatToolbarModule} from '@angular/material/toolbar';
-
+import { Router } from '@angular/router';
+import {RouterModule} from '@angular/router';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 @Component({
   selector: 'app-navbar',
-  imports: [MatMenuModule, MatToolbarModule],
+  standalone: true,
+  imports: [MatMenuModule, MatToolbarModule, RouterModule],
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.css'] // Corrigez 'styleUrl' en 'styleUrls'
+  styleUrls: ['./navbar.component.css'],
 })
 export class NavbarComponent {
-  isLoggedIn: boolean = false;
+  isLoggedIn: boolean = false; // Remplacez par la logique réelle pour vérifier l'authentification
+
+  constructor(private router: Router) {}
 
   onLoginLogout(): void {
-    this.isLoggedIn = !this.isLoggedIn;
-    console.log(this.isLoggedIn ? 'User logged in' : 'User logged out');
+    if (this.isLoggedIn) {
+      // Logique de déconnexion
+      this.isLoggedIn = false;
+      console.log('Utilisateur déconnecté.');
+      this.router.navigate(['/login']);
+    } else {
+      // Redirige vers /login
+      this.router.navigate(['/login']);
+    }
   }
-  
 }

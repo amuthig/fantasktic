@@ -1,6 +1,9 @@
 package com.fantastik.fantastik.model;
 
-import javax.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.*;
+
 import lombok.Data;
 
 @Entity
@@ -20,4 +23,9 @@ public class Tasks {
 
     @Column(nullable = false)
     private int stage;
+
+    @JsonIgnore
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private Users user;
 }

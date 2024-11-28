@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.fantastik.fantastik.model.Users;
@@ -15,10 +14,13 @@ import com.fantastik.fantastik.repository.UsersRepository;
 public class UsersService {
 
     @Autowired
-    private UsersRepository userRepository;
+    private UsersRepository usersRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public Users registerUser(Users user) {
+        // Chiffrer le mot de passe
+        user.setPassword(user.getPassword());
+        return usersRepository.save(user);
+    }
 
     /**
      * CREATE: Ajouter un nouvel utilisateur.
@@ -28,8 +30,8 @@ public class UsersService {
      */
     public Users createUser(Users user) {
         // Encoder le mot de passe avant d'enregistrer l'utilisateur
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        user.setPassword(user.getPassword());
+        return usersRepository.save(user);
     }
 
     /**
@@ -38,7 +40,7 @@ public class UsersService {
      * @return La liste des utilisateurs.
      */
     public List<Users> getAllUsers() {
-        return userRepository.findAll();
+        return usersRepository.findAll();
     }
 
     /**
@@ -48,7 +50,7 @@ public class UsersService {
      * @return L'utilisateur trouvé ou une exception si introuvable.
      */
     public Optional<Users> getUserById(Long id) {
-        return userRepository.findById(id);
+        return usersRepository.findById(id);
     }
 
     /**
@@ -58,7 +60,7 @@ public class UsersService {
      * @return L'utilisateur trouvé ou une exception si introuvable.
      */
     public Optional<Users> getUserByUsername(String username) {
-        return userRepository.findByUsername(username);
+        return usersRepository.findByUsername(username);
     }
 
     /**
@@ -69,15 +71,15 @@ public class UsersService {
      * @return L'utilisateur mis à jour.
      */
     public Users updateUser(Long id, Users userDetails) {
-        Users user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        Users user = usersRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
         user.setUsername(userDetails.getUsername());
         user.setEmail(userDetails.getEmail());
         user.setFirstName(userDetails.getFirstName());
         user.setLastName(userDetails.getLastName());
         if (userDetails.getPassword() != null && !userDetails.getPassword().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
+            user.setPassword(userDetails.getPassword());
         }
-        return userRepository.save(user);
+        return usersRepository.save(user);
     }
 
     /**
@@ -86,7 +88,7 @@ public class UsersService {
      * @param id L'ID de l'utilisateur à supprimer.
      */
     public void deleteUser(Long id) {
-        Users user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-        userRepository.delete(user);
+        Users user = usersRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        usersRepository.delete(user);
     }
 }

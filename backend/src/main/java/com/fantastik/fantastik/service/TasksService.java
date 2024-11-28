@@ -10,10 +10,10 @@ import com.fantastik.fantastik.model.Tasks;
 import com.fantastik.fantastik.repository.TasksRepository;
 
 @Service
-public class TaskService {
+public class TasksService {
 
     @Autowired
-    private TasksRepository taskRepository;
+    private TasksRepository tasksRepository;
 
     /**
      * CREATE: Ajouter une nouvelle tâche.
@@ -22,7 +22,7 @@ public class TaskService {
      * @return La tâche ajoutée.
      */
     public Tasks createTask(Tasks task) {
-        return taskRepository.save(task);
+        return tasksRepository.save(task);
     }
 
     /**
@@ -31,7 +31,7 @@ public class TaskService {
      * @return La liste des tâches.
      */
     public List<Tasks> getAllTasks() {
-        return taskRepository.findAll();
+        return tasksRepository.findAll();
     }
 
     /**
@@ -41,7 +41,7 @@ public class TaskService {
      * @return La tâche trouvée ou une exception si introuvable.
      */
     public Optional<Tasks> getTaskById(Long id) {
-        return taskRepository.findById(id);
+        return tasksRepository.findById(id);
     }
 
     /**
@@ -52,11 +52,11 @@ public class TaskService {
      * @return La tâche mise à jour.
      */
     public Tasks updateTask(Long id, Tasks taskDetails) {
-        Tasks task = taskRepository.findById(id).orElseThrow(() -> new RuntimeException("Task not found"));
+        Tasks task = tasksRepository.findById(id).orElseThrow(() -> new RuntimeException("Task not found"));
         task.setTitle(taskDetails.getTitle());
         task.setDescription(taskDetails.getDescription());
         task.setStage(taskDetails.getStage());
-        return taskRepository.save(task);
+        return tasksRepository.save(task);
     }
 
     /**
@@ -65,7 +65,7 @@ public class TaskService {
      * @param id L'ID de la tâche à supprimer.
      */
     public void deleteTask(Long id) {
-        Tasks task = taskRepository.findById(id).orElseThrow(() -> new RuntimeException("Task not found"));
-        taskRepository.delete(task);
+        Tasks task = tasksRepository.findById(id).orElseThrow(() -> new RuntimeException("Task not found"));
+        tasksRepository.delete(task);
     }
 }

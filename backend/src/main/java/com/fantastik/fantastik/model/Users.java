@@ -1,6 +1,8 @@
 package com.fantastik.fantastik.model;
 
-import javax.persistence.*;
+import java.util.List;
+
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
@@ -9,7 +11,7 @@ import lombok.Data;
 public class Users {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Column(nullable = false, unique = true)
@@ -26,5 +28,8 @@ public class Users {
 
     @Column(nullable = false)
     private String lastName;
+
+    @OneToMany(mappedBy = "user")
+    private List<Tasks> tasks;
 
 }

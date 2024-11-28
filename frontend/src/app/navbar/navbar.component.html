@@ -1,15 +1,22 @@
 <mat-toolbar class="navbar">
-    <!-- Logo à gauche -->
-    <span class="logo">Fantasktic</span>
-  
-    <!-- Navigation à droite -->
-    <span class="spacer"></span>
-    <button mat-button [matMenuTriggerFor]="projectsMenu" class="nav-item">Projects</button>
-    <mat-menu #projectsMenu="matMenu">
-      <button mat-menu-item>Project 1</button>
-      <button mat-menu-item>Project 2</button>
-      <button mat-menu-item>Project 3</button>
-    </mat-menu>
-    <button mat-button (click)="onLoginLogout()" class="nav-item">{{ isLoggedIn ? 'Logout' : 'Login' }}</button>
-  </mat-toolbar>
-  
+  <!-- Logo à gauche -->
+  <span class="logo" style="cursor: pointer;" [routerLink]="['/']">Fantasktic</span>
+
+
+  <!-- Navigation à droite -->
+  <span class="spacer"></span>
+  <button mat-button [matMenuTriggerFor]="projectsMenu" class="nav-item">Projects</button>
+  <mat-menu #projectsMenu="matMenu">
+    <button mat-menu-item>Project 1</button>
+    <button mat-menu-item>Project 2</button>
+    <button mat-menu-item>Project 3</button>
+  </mat-menu>
+
+  <!-- Bouton Login/Logout -->
+  <button 
+    mat-button 
+    class="nav-item" 
+    (click)="onLoginLogout()">
+    {{ isLoggedIn ? 'Logout' : 'Login' }}
+  </button>
+</mat-toolbar>

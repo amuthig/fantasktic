@@ -1,38 +1,59 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { RouterModule } from '@angular/router';
+import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatDialog } from '@angular/material/dialog';
+import { AddTaskComponent } from '../add-task/add-task.component';
 import { AuthService } from '../auth/auth.service';
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common'; // Importer CommonModule pour NgIf
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [MatMenuModule, MatToolbarModule, RouterModule],
+  imports: [MatMenuModule, MatToolbarModule, RouterModule, CommonModule],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
 })
 export class NavbarComponent implements OnInit {
   isLoggedIn: boolean = false;
+  showNavbar: boolean = true;
 
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(private router: Router, private route: ActivatedRoute, private authService: AuthService, private dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.authService.isLoggedIn.subscribe((loggedIn) => {
       this.isLoggedIn = loggedIn;
+    });
+
+    this.router.events.pipe(filter(event => event instanceof NavigationEnd)).subscribe(() => {
+      const currentRoute = this.router.url;
+      this.showNavbar = !(currentRoute.includes('/login') || currentRoute.includes('/signup'));
     });
   }
 
   // Gère la connexion/déconnexion
   onLoginLogout(): void {
     if (this.isLoggedIn) {
-      // Logique de déconnexion
       this.authService.logout();
-      console.log('Utilisateur déconnecté.');
       this.router.navigate(['/login']);
     } else {
-      // Redirige vers /login
       this.router.navigate(['/login']);
     }
+  }
+
+  // Ouvre le dialog pour ajouter une tâche
+  openAddTaskDialog(): void {
+    const dialogRef = this.dialog.open(AddTaskComponent, {
+      width: '400px'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Logique pour ajouter la tâche
+        console.log('Nouvelle tâche ajoutée :', result);
+      }
+    });
   }
 }

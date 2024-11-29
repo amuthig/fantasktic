@@ -1,38 +1,76 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgFor } from '@angular/common';
-import { DragDropModule } from '@angular/cdk/drag-drop';
+import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
+import { TaskComponent } from '../task/task.component';
+import { TasksService } from '../task.service';
+
 
 @Component({
   selector: 'app-kanban',
   standalone: true,
-  imports: [NgFor, DragDropModule],
+  imports: [NgFor, DragDropModule, TaskComponent],
   templateUrl: './kanban.component.html',
   styleUrls: ['./kanban.component.css'],
 })
-export class KanbanComponent {
+export class KanbanComponent implements OnInit {
   columns = [
-    { title: 'Backlog', tasks: ['Task 1', 'Task 2', 'Task 3'] },
-    { title: 'In Progress', tasks: ['Task 4', 'Task 5'] },
-    { title: 'Review', tasks: ['Task 6'] },
-    { title: 'Done', tasks: ['Task 7', 'Task 8'] },
+    { title: 'Backlog', tasks: [] as any[] },
+    { title: 'In Progress', tasks: [] as any[] },
+    { title: 'Review', tasks: [] as any[] },
+    { title: 'Done', tasks: [] as any[] },
   ];
 
-  get columnTitles(): string[] {
-    return this.columns.map((c) => c.title);
+  connectedTo: string[] = [];
+
+  constructor(private tasksService: TasksService) {}
+
+  ngOnInit(): void {
+    this.loadTasks();
+    this.connectedTo = this.columns.map((_, index) => 'task-list-' + index);
   }
 
-  onDrop(event: any, column: any): void {
-    // Cette ligne détermine si la tâche est déplacée d'une autre colonne
+  // Méthode pour charger les tâches depuis l'API
+  loadTasks(): void {
+    this.tasksService.getTasks().subscribe((tasks: any[]) => {
+      tasks.forEach((task: any) => {
+        this.columns[task.stage].tasks.push(task);
+      });
+    });
+  }
+
+  // Méthode pour supprimer une tâche
+  deleteTask(taskId: number): void {
+    this.columns.forEach((column) => {
+      column.tasks = column.tasks.filter((task) => task.id !== taskId);
+    });
+  }
+
+  // Méthode pour mettre à jour une tâche
+  updateTask(updatedTask: any): void {
+    this.columns.forEach((column) => {
+      const taskIndex = column.tasks.findIndex((task) => task.id === updatedTask.id);
+      if (taskIndex !== -1) {
+        column.tasks.splice(taskIndex, 1);
+      }
+    });
+    this.columns[updatedTask.stage].tasks.push(updatedTask);
+  }
+
+  onDrop(event: CdkDragDrop<any[]>, column: any): void {
     const previousColumn = event.previousContainer.data;
     const currentColumn = column.tasks;
 
-    // Si la tâche est déplacée d'une colonne à une autre
     if (event.previousContainer !== event.container) {
-      // Retirer la tâche de la colonne d'origine
       const task = previousColumn.splice(event.previousIndex, 1)[0];
-      // Ajouter la tâche dans la nouvelle colonne
+      task.stage = this.columns.indexOf(column); // Mettre à jour le stage de la tâche
+      currentColumn.splice(event.currentIndex, 0, task);
+      console.log(`Tâche déplacée vers la colonne : ${column.title}`); // Afficher la colonne dans la console
+      this.tasksService.updateTask(task.id, task).subscribe(updatedTask => {
+        this.updateTask(updatedTask); // Mettre à jour l'interface utilisateur avec la tâche mise à jour
+      });
+    } else {
+      const task = currentColumn.splice(event.previousIndex, 1)[0];
       currentColumn.splice(event.currentIndex, 0, task);
     }
   }
 }
-

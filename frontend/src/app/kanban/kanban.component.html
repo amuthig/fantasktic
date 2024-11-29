@@ -1,20 +1,17 @@
 <div class="kanban-board">
+  <div *ngFor="let column of columns; let i = index" class="kanban-column">
+    <h2>{{ column.title }}</h2>
     <div
-      class="kanban-column"
-      *ngFor="let column of columns"
       cdkDropList
       [cdkDropListData]="column.tasks"
-      [cdkDropListConnectedTo]="columnTitles"
+      class="task-list"
       (cdkDropListDropped)="onDrop($event, column)"
+      [cdkDropListConnectedTo]="connectedTo"
+      [id]="'task-list-' + i"
     >
-      <h2>{{ column.title }}</h2>
-      <div
-        class="kanban-task"
-        *ngFor="let task of column.tasks"
-        cdkDrag
-      >
-        {{ task }}
+      <div *ngFor="let task of column.tasks" cdkDrag>
+        <app-task [task]="task" (delete)="deleteTask($event)" (update)="updateTask($event)"></app-task>
       </div>
     </div>
   </div>
-  
+</div>

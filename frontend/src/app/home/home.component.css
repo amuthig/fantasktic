@@ -1,0 +1,17 @@
+.home-container {
+    display: flex;
+    flex-direction: column;
+    height: 91vh; /* Assurez-vous que la page occupe toute la hauteur de l'écran */
+    overflow: hidden; /* Empêche le défilement */
+  }
+  
+  app-navbar {
+    flex: 0 0 auto; /* La navbar prend seulement la hauteur nécessaire */
+  }
+  
+  .kanban-container {
+    flex: 1 1 auto; /* Le kanban prend le reste de l'espace disponible */
+    overflow: hidden; /* Empêche le défilement */
+    display: flex; /* Utilise Flexbox pour organiser les éléments internes */
+    flex-direction: column; /* Organise les éléments internes en colonne */
+  }

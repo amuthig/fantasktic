@@ -52,12 +52,11 @@ export class SignupComponent {
           // Gestion de la réponse si nécessaire
           console.log('User signed up successfully', response);
           this.snackBar.open('Inscription réussie !', 'Fermer', {
+            duration: 3000,
           });
-          // Stocker le token JWT
-          localStorage.setItem('token', response.token);
+          // Stocker le token JWT et mettre à jour l'état de connexion
+          this.authService.setLoginStatus(response.token);
           // Redirection vers la page d'accueil après l'inscription réussie
-
-          
           this.router.navigate(['/']);
         },
         (error) => {
@@ -65,9 +64,11 @@ export class SignupComponent {
           console.error('Error during signup', error);
           if (error.status === 409) { // Conflit, utilisateur ou email existe déjà
             this.snackBar.open('Nom d\'utilisateur ou email existe déjà.', 'Fermer', {
+              duration: 3000,
             });
           } else {
             this.snackBar.open('Erreur lors de l\'inscription. Veuillez réessayer.', 'Fermer', {
+              duration: 3000,
             });
           }
         }

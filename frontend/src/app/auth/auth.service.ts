@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 // Modèle pour le login et signup
 interface User {
@@ -16,6 +16,11 @@ interface User {
 })
 export class AuthService {
   private apiUrl = 'http://localhost:8080/api/auth'; // URL de l'API Spring Boot
+  private loggedIn = new BehaviorSubject<boolean>(this.hasToken());
+
+  get isLoggedIn() {
+    return this.loggedIn.asObservable();
+  }
 
   constructor(private http: HttpClient) {}
 
@@ -26,17 +31,40 @@ export class AuthService {
 
   // Fonction de signup
   signup(user: User): Observable<any> {
-    //console.log(user);
     return this.http.post<any>(`${this.apiUrl}/signup`, user);
   }
 
   // Récupérer le token JWT stocké
   getToken(): string | null {
-    return localStorage.getItem('token');
+    if (typeof localStorage !== 'undefined') {
+      return localStorage.getItem('token');
+    }
+    return null;
   }
 
   // Vérifier si l'utilisateur est authentifié
   isAuthenticated(): boolean {
     return this.getToken() !== null;
+  }
+
+  // Vérifier si le token est présent
+  private hasToken(): boolean {
+    return this.getToken() !== null;
+  }
+
+  // Mettre à jour l'état de connexion
+  setLoginStatus(token: string): void {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('token', token);
+    }
+    this.loggedIn.next(true);
+  }
+
+  // Déconnexion
+  logout(): void {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('token');
+    }
+    this.loggedIn.next(false);
   }
 }

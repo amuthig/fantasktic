@@ -41,8 +41,8 @@ export class LoginComponent {
       const { username, password } = this.loginForm.value;
       this.authService.login(username, password).subscribe(
         (response) => {
-          // Le jeton JWT est stocké dans le localStorage
-          localStorage.setItem('token', response.token);
+          // Stocker le token JWT et mettre à jour l'état de connexion
+          this.authService.setLoginStatus(response.token);
           // Redirection vers la page d'accueil ou une autre page
           this.router.navigate(['/']);
         },
@@ -53,15 +53,14 @@ export class LoginComponent {
     }
   }
 
-  
   // Fonction pour vérifier si l'utilisateur est connecté
   isLoggedIn(): boolean {
-    return localStorage.getItem('token') !== null;
+    return this.authService.isAuthenticated();
   }
 
   // Fonction pour gérer la déconnexion
   onLogout(): void {
-    localStorage.removeItem('token');
+    this.authService.logout();
     this.router.navigate(['/login']);
   }
 

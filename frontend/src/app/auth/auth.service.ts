@@ -26,12 +26,13 @@ export class AuthService {
 
   // Fonction de signup
   signup(user: User): Observable<any> {
+    //console.log(user);
     return this.http.post<any>(`${this.apiUrl}/signup`, user);
   }
 
   // Récupérer le token JWT stocké
   getToken(): string | null {
-    return localStorage.getItem('jwt');
+    return localStorage.getItem('token');
   }
 
   // Vérifier si l'utilisateur est authentifié

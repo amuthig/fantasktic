@@ -6,7 +6,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-signup',
@@ -19,13 +20,19 @@ import { Router, RouterModule } from '@angular/router';
     MatCardModule,
     MatButtonModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    MatSnackBarModule
   ]
 })
 export class SignupComponent {
   signupForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router,
+    private snackBar: MatSnackBar
+  ) {
     // Initialisation du formulaire avec les validations
     this.signupForm = this.fb.group({
       username: ['', [Validators.required]],
@@ -41,21 +48,35 @@ export class SignupComponent {
     if (this.signupForm.valid) {
       const { username, firstName, lastName, email, password } = this.signupForm.value;
       this.authService.signup({ username, firstName, lastName, email, password }).subscribe(
-        (response) => {
+        (response: any) => {
           // Gestion de la réponse si nécessaire
           console.log('User signed up successfully', response);
+          this.snackBar.open('Inscription réussie !', 'Fermer', {
+          });
+          // Stocker le token JWT
+          localStorage.setItem('token', response.token);
+          // Redirection vers la page d'accueil après l'inscription réussie
+
+          
+          this.router.navigate(['/']);
         },
         (error) => {
           // Gestion des erreurs si nécessaire
           console.error('Error during signup', error);
+          if (error.status === 409) { // Conflit, utilisateur ou email existe déjà
+            this.snackBar.open('Nom d\'utilisateur ou email existe déjà.', 'Fermer', {
+            });
+          } else {
+            this.snackBar.open('Erreur lors de l\'inscription. Veuillez réessayer.', 'Fermer', {
+            });
+          }
         }
       );
     }
   }
 
-   // Fonction pour naviguer vers la page de login
-   navigateToLogin(): void {
+  // Fonction pour naviguer vers la page de login
+  navigateToLogin(): void {
     this.router.navigate(['/login']);
   }
-
 }

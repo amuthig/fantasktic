@@ -4,11 +4,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.fantastik.fantastik.model.Users;
-
 import com.fantastik.fantastik.repository.UsersRepository;
+import com.fantastik.fantastik.util.JwtUtil;
 
 @Service
 public class UsersService {
@@ -16,10 +18,22 @@ public class UsersService {
     @Autowired
     private UsersRepository usersRepository;
 
-    public Users registerUser(Users user) {
-        // Chiffrer le mot de passe
-        user.setPassword(user.getPassword());
-        return usersRepository.save(user);
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    public String registerUser(Users user) {
+        try {
+            // Chiffrer le mot de passe
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            usersRepository.save(user);
+            // Générer un token JWT
+            return jwtUtil.generateToken(user.getUsername());
+        } catch (DataIntegrityViolationException ex) {
+            throw new DataIntegrityViolationException("Nom d'utilisateur ou email existe déjà.");
+        }
     }
 
     /**
@@ -30,7 +44,7 @@ public class UsersService {
      */
     public Users createUser(Users user) {
         // Encoder le mot de passe avant d'enregistrer l'utilisateur
-        user.setPassword(user.getPassword());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return usersRepository.save(user);
     }
 
@@ -77,7 +91,7 @@ public class UsersService {
         user.setFirstName(userDetails.getFirstName());
         user.setLastName(userDetails.getLastName());
         if (userDetails.getPassword() != null && !userDetails.getPassword().isEmpty()) {
-            user.setPassword(userDetails.getPassword());
+            user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
         }
         return usersRepository.save(user);
     }

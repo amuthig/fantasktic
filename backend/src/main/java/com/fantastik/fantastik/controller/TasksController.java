@@ -1,7 +1,11 @@
 package com.fantastik.fantastik.controller;
 
 import com.fantastik.fantastik.model.Tasks;
+import com.fantastik.fantastik.model.Users;
 import com.fantastik.fantastik.service.TasksService;
+import com.fantastik.fantastik.service.UsersService;
+import com.fantastik.fantastik.util.JwtUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,14 +16,26 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/tasks")
+@CrossOrigin(origins = "http://localhost:4200")
 public class TasksController {
 
     @Autowired
     private TasksService tasksService;
 
+    @Autowired
+    private UsersService userService;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
     // CREATE
     @PostMapping
-    public ResponseEntity<Tasks> createTask(@RequestBody Tasks task) {
+    public ResponseEntity<Tasks> createTask(@RequestBody Tasks task, @RequestHeader("Authorization") String token) {
+        String username = jwtUtil.extractUsername(token.substring(7));
+
+        Users user = userService.getUserByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        task.setUser(user);
         Tasks newTask = tasksService.createTask(task);
         return new ResponseEntity<>(newTask, HttpStatus.CREATED);
     }

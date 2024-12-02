@@ -5,12 +5,15 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatOptionModule } from '@angular/material/core';
+import { MatOptionModule, provideNativeDateAdapter } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule, DateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
 
 @Component({
   selector: 'app-edit-task',
   standalone: true,
+  providers: [provideNativeDateAdapter()],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -19,11 +22,12 @@ import { MatSelectModule } from '@angular/material/select';
     MatInputModule, 
     MatFormFieldModule, 
     MatOptionModule, 
-    MatSelectModule
-
+    MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule
   ],
   templateUrl: './edit-task.component.html',
-  styleUrls: ['./edit-task.component.css']
+  styleUrls: ['./edit-task.component.css'],
 })
 export class EditTaskComponent {
   editTaskForm: FormGroup;
@@ -36,7 +40,9 @@ export class EditTaskComponent {
     this.editTaskForm = this.fb.group({
       title: [data.title],
       description: [data.description],
-      stage: [data.stage]
+      stage: [data.stage],
+      createdById: [data.createdById],
+      deadline: [data.deadline]
     });
   }
 

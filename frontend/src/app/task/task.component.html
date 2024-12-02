@@ -4,6 +4,8 @@
   </mat-card-header>
   <mat-card-content>
     <p>{{ task.description }}</p>
+    <p><strong>Created By:</strong> {{ createdByUsername }}</p>
+    <p><strong>Deadline:</strong> {{ task.deadline | date }}</p>
   </mat-card-content>
   <mat-card-actions>
     <button mat-flat-button color="primary" class="edit-button" (click)="openEditDialog()">Edit</button>

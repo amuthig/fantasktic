@@ -57,6 +57,8 @@ public class TasksService {
         task.setTitle(taskDetails.getTitle());
         task.setDescription(taskDetails.getDescription());
         task.setStage(taskDetails.getStage());
+        task.setDeadline(taskDetails.getDeadline());
+        task.setCreatedById(taskDetails.getCreatedById());
         return tasksRepository.save(task);
     }
 

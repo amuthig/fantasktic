@@ -31,11 +31,12 @@ public class TasksController {
     // CREATE
     @PostMapping
     public ResponseEntity<Tasks> createTask(@RequestBody Tasks task, @RequestHeader("Authorization") String token) {
+        // getting the user from the token
         String username = jwtUtil.extractUsername(token.substring(7));
-
         Users user = userService.getUserByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         task.setUser(user);
+
         Tasks newTask = tasksService.createTask(task);
         return new ResponseEntity<>(newTask, HttpStatus.CREATED);
     }

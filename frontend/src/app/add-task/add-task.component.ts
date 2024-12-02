@@ -52,10 +52,10 @@ export class AddTaskComponent implements OnInit {
   ) {
     this.addTaskForm = this.fb.group({
       title: ['', Validators.required],
-      description: [''],
+      description: ['', Validators.required],
       stage: [0], // Default to Backlog
-      assignee: [''],
-      deadline: [null] // Datepicker field
+      createdById: ['', Validators.required],
+      deadline: [null, Validators.required] // Datepicker field
     });
   }
 

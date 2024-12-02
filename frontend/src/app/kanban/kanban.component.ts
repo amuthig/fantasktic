@@ -82,21 +82,4 @@ export class KanbanComponent implements OnInit {
       currentColumn.splice(event.currentIndex, 0, task);
     }
   }
-
-  // Ouvre le dialog pour ajouter une tâche
-  openAddTaskDialog(): void {
-    const dialogRef = this.dialog.open(AddTaskComponent, {
-      width: '400px'
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.tasksService.addTask(result).subscribe(newTask => {
-          this.columns[newTask.stage].tasks.push(newTask); // Ajouter la nouvelle tâche à la colonne appropriée
-          this.tasksService.notifyTaskUpdates(); // Notifier les mises à jour des tâches
-          this.cdr.detectChanges(); // Forcer la détection des changements
-        });
-      }
-    });
-  }
 }

@@ -1,5 +1,8 @@
 package com.fantastik.fantastik.model;
 
+import java.math.BigInteger;
+import java.util.Date;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -23,6 +26,12 @@ public class Tasks {
 
     @Column(nullable = false)
     private int stage;
+
+    @Column(nullable = false)
+    private BigInteger createdById;
+
+    @Column(nullable = false)
+    private Date deadline;
 
     @JsonIgnore
     @ManyToOne(optional = false)

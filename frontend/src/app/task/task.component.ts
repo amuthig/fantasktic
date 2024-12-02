@@ -1,10 +1,11 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { TasksService } from '../task.service';
 import { MatDialog } from '@angular/material/dialog';
 import { EditTaskComponent } from '../edit-task/edit-task.component';
+import { UsersService } from '../users.service';
 
 @Component({
   selector: 'app-task',
@@ -13,14 +14,30 @@ import { EditTaskComponent } from '../edit-task/edit-task.component';
   templateUrl: './task.component.html',
   styleUrls: ['./task.component.css'],
 })
-export class TaskComponent {
+export class TaskComponent implements OnInit {
   @Input() task!: any;
   @Output() delete = new EventEmitter<number>();
   @Output() update = new EventEmitter<any>();
 
+  createdByUsername: string | undefined;
 
-  constructor(private tasksService: TasksService, private dialog: MatDialog) {}
-  
+  constructor(
+    private tasksService: TasksService,
+    private dialog: MatDialog,
+    private usersService: UsersService
+  ) {}
+
+  ngOnInit(): void {
+    this.loadCreatedByUsername();
+  }
+
+  // Méthode pour charger le nom d'utilisateur du créateur
+  loadCreatedByUsername(): void {
+    this.usersService.getUserById(this.task.createdById).subscribe(user => {
+      this.createdByUsername = user.username;
+    });
+  }
+
   // Méthode pour ouvrir le dialog de modification
   openEditDialog(): void {
     const dialogRef = this.dialog.open(EditTaskComponent, {
@@ -34,11 +51,15 @@ export class TaskComponent {
           this.task.title = updatedTask.title;
           this.task.description = updatedTask.description;
           this.task.stage = updatedTask.stage;
+          this.task.createdById = updatedTask.createdById;
+          this.task.deadline = updatedTask.deadline;
           this.update.emit(updatedTask);
+          this.loadCreatedByUsername(); // Recharger le nom d'utilisateur après la mise à jour
         });
       }
     });
   }
+
   // Méthode pour obtenir le nom de l'étape en fonction de l'ID de l'étape
   getStageName(stage: number): string {
     switch (stage) {

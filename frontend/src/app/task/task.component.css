@@ -1,3 +1,28 @@
 .task {
-    margin: 10px;
-  }
+  margin: 10px;
+}
+
+.mat-card-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.edit-button {
+  background-color: #1976d2; /* Couleur bleue pour le fond du bouton Modifier */
+  color: white; /* Couleur du texte en blanc */
+  height: 30px; /* Hauteur du bouton Modifier */
+  min-width: 80px; /* Largeur minimale du bouton Modifier */
+  padding: 0 8px; /* Padding du bouton Modifier */
+  font-size: 12px; /* Taille de la police du bouton Modifier */
+}
+
+.delete-button {
+  background-color: #be2f25; /* Couleur rouge pour le fond du bouton Supprimer */
+  color: white; /* Couleur du texte en blanc */
+  height: 30px; /* Hauteur du bouton Supprimer */
+  min-width: 80px; /* Largeur minimale du bouton Supprimer */
+  padding: 0 8px; /* Padding du bouton Supprimer */
+  font-size: 12px; /* Taille de la police du bouton Supprimer */
+  margin-left: auto; /* Pousser le bouton Supprimer vers la droite */
+}

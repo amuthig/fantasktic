@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { Router } from '@angular/router';
 
 // Modèle pour le login et signup
 interface User {
@@ -22,7 +23,7 @@ export class AuthService {
     return this.loggedIn.asObservable();
   }
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router: Router) {}
 
   // Fonction de login
   login(username: string, password: string): Observable<any> {
@@ -66,5 +67,6 @@ export class AuthService {
       localStorage.removeItem('token');
     }
     this.loggedIn.next(false);
+    this.router.navigate(['/login']);
   }
 }

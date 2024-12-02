@@ -1,21 +1,26 @@
-<h2 mat-dialog-title>Modifier la tâche</h2>
+<h2 mat-dialog-title class="dialog-title">Edit task</h2>
 <mat-dialog-content>
   <form [formGroup]="editTaskForm">
-    <mat-form-field appearance="fill">
-      <mat-label>Titre</mat-label>
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Title</mat-label>
       <input matInput formControlName="title">
     </mat-form-field>
-    <mat-form-field appearance="fill">
+    <mat-form-field appearance="fill" class="full-width">
       <mat-label>Description</mat-label>
       <textarea matInput formControlName="description"></textarea>
     </mat-form-field>
-    <mat-form-field appearance="fill">
-      <mat-label>Étape</mat-label>
-      <input matInput formControlName="stage" type="number">
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Stage</mat-label>
+      <mat-select formControlName="stage">
+        <mat-option [value]="0">Backlog</mat-option>
+        <mat-option [value]="1">In Progress</mat-option>
+        <mat-option [value]="2">Review</mat-option>
+        <mat-option [value]="3">Done</mat-option>
+      </mat-select>
     </mat-form-field>
   </form>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button (click)="onCancel()">Annuler</button>
-  <button mat-button color="primary" (click)="onSave()">Enregistrer</button>
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-button color="primary" (click)="onSave()">Save</button>
 </mat-dialog-actions>

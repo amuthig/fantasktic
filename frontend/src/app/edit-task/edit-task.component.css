@@ -1,0 +1,24 @@
+/* Centrer le titre du dialog */
+.dialog-title {
+    text-align: center;
+    font-size: 24px; /* Augmenter la taille de la police du titre */
+    font-weight: bold; /* Mettre le titre en gras */
+    margin-bottom: 16px; /* Ajouter un espace sous le titre */
+  }
+  
+  /* Assurez-vous que les champs de formulaire occupent toute la largeur */
+  .full-width {
+    width: 100%;
+    margin-bottom: 16px; /* Ajouter un espace entre les champs */
+  }
+  
+  .mat-dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%; /* Assurez-vous que les actions prennent toute la largeur */
+    padding: 8px 0; /* Ajouter un peu de padding en haut et en bas */
+  }
+  
+  .mat-dialog-actions button {
+    margin-left: 8px; /* Ajouter un espace entre les boutons */
+  }

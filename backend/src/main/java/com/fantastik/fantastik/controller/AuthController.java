@@ -35,7 +35,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> signIn(@RequestBody Users user) {
+    public ResponseEntity<?> login(@RequestBody Users user) {
         Optional<Users> existingUser = userService.getUserByUsername(user.getUsername());
         if (existingUser.isPresent()
                 && new BCryptPasswordEncoder().matches(user.getPassword(), existingUser.get().getPassword())) {

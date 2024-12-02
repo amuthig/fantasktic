@@ -28,6 +28,9 @@
   font-weight: bold;
   margin: 0;
   color: #333;
+  text-align: center; /* Centrer le texte */
+  padding: 8px 0; /* Ajouter un peu de padding */
+  border-bottom: 2px solid #ddd; /* Ajouter une bordure en bas */
 }
 
 /* Zones de dépôt */

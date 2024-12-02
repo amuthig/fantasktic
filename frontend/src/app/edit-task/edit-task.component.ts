@@ -4,6 +4,9 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatOptionModule } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-edit-task',
@@ -13,7 +16,11 @@ import { MatInputModule } from '@angular/material/input';
     ReactiveFormsModule,
     MatDialogModule,
     MatButtonModule,
-    MatInputModule
+    MatInputModule, 
+    MatFormFieldModule, 
+    MatOptionModule, 
+    MatSelectModule
+
   ],
   templateUrl: './edit-task.component.html',
   styleUrls: ['./edit-task.component.css']

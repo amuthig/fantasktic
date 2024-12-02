@@ -1,21 +1,48 @@
-<h2 mat-dialog-title>Ajouter une tâche</h2>
+<h2 mat-dialog-title class="dialog-title">New Task</h2>
 <mat-dialog-content>
-  <form [formGroup]="addTaskForm">
-    <mat-form-field appearance="fill">
-      <mat-label>Titre</mat-label>
-      <input matInput formControlName="title">
+  <form [formGroup]="addTaskForm" class="full-width">
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Title</mat-label>
+      <input matInput formControlName="title" required>
+      <mat-error *ngIf="addTaskForm.get('title')?.hasError('required')">
+        Title is required.
+      </mat-error>
     </mat-form-field>
-    <mat-form-field appearance="fill">
+    <mat-form-field appearance="fill" class="full-width">
       <mat-label>Description</mat-label>
-      <textarea matInput formControlName="description"></textarea>
+      <textarea matInput formControlName="description" required></textarea>
+      <mat-error *ngIf="addTaskForm.get('description')?.hasError('required')">
+        Description is required.
+      </mat-error>
     </mat-form-field>
-    <mat-form-field appearance="fill">
-      <mat-label>Étape</mat-label>
-      <input matInput formControlName="stage" type="number">
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Stage</mat-label>
+      <mat-select formControlName="stage">
+        <mat-option [value]="0">Backlog</mat-option>
+        <mat-option [value]="1">In Progress</mat-option>
+        <mat-option [value]="2">Review</mat-option>
+        <mat-option [value]="3">Done</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Assigned to</mat-label>
+      <mat-select formControlName="assignee" required>
+        <mat-option *ngFor="let user of users" [value]="user.id">{{ user.username }}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="addTaskForm.get('assignee')?.hasError('required')">
+        Assignee is required.
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Choose a date</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="deadline">
+      <mat-hint>MM/DD/YYYY</mat-hint>
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
     </mat-form-field>
   </form>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button (click)="onCancel()">Annuler</button>
-  <button mat-button color="primary" (click)="onSave()">Enregistrer</button>
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-button color="primary" (click)="onSave()" [disabled]="addTaskForm.invalid">Save</button>
 </mat-dialog-actions>

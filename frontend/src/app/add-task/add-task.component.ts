@@ -39,7 +39,7 @@ export class AddTaskComponent {
   onSave(): void {
     if (this.addTaskForm.valid) {
       const newTask: any = this.addTaskForm.value;
-      console.log(newTask);
+      
       this.tasksService.addTask(newTask).subscribe((task: any) => {
         this.dialogRef.close(task);
       });

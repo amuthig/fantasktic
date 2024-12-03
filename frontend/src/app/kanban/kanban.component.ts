@@ -1,10 +1,15 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, Input, OnChanges } from '@angular/core';
 import { NgFor } from '@angular/common';
 import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
 import { TaskComponent } from '../task/task.component';
 import { TasksService } from '../task.service';
 import { MatDialog } from '@angular/material/dialog';
 import { AddTaskComponent } from '../add-task/add-task.component';
+import { UsersService } from '../users.service';
+
+import { forkJoin } from 'rxjs';
+import { map } from 'rxjs/operators';
+
 
 @Component({
   selector: 'app-kanban',
@@ -13,7 +18,8 @@ import { AddTaskComponent } from '../add-task/add-task.component';
   templateUrl: './kanban.component.html',
   styleUrls: ['./kanban.component.css'],
 })
-export class KanbanComponent implements OnInit {
+export class KanbanComponent implements OnInit, OnChanges {
+  @Input() filters: any = {};
   columns = [
     { title: 'Backlog', tasks: [] as any[] },
     { title: 'In Progress', tasks: [] as any[] },
@@ -22,8 +28,9 @@ export class KanbanComponent implements OnInit {
   ];
 
   connectedTo: string[] = [];
+  filteredColumns = this.columns;
 
-  constructor(private tasksService: TasksService, private dialog: MatDialog, private cdr: ChangeDetectorRef) {}
+  constructor(private usersService: UsersService, private tasksService: TasksService, private dialog: MatDialog, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.loadTasks();
@@ -33,6 +40,12 @@ export class KanbanComponent implements OnInit {
     });
   }
 
+  ngOnChanges(): void {
+    this.applyFilters();
+  }
+
+
+
   // Méthode pour charger les tâches depuis l'API
   loadTasks(): void {
     this.tasksService.getTasks().subscribe((tasks: any[]) => {
@@ -41,8 +54,48 @@ export class KanbanComponent implements OnInit {
         this.columns[task.stage].tasks.push(task);
         console.log(task); // Afficher la tâche dans la console
       });
+      this.applyFilters();
       this.cdr.detectChanges(); // Forcer la détection des changements
     });
+  }
+
+  applyFilters(): void {
+    const { assignee, daysUntilDeadline } = this.filters;
+    if (assignee) {
+      const userObservables = this.columns.flatMap(column =>
+        column.tasks.map(task => this.usersService.getUserById(task.user_id).pipe(
+          map(user => ({ ...task, assigneeUsername: user.username }))
+        ))
+      );
+
+      forkJoin(userObservables).subscribe(tasksWithUsernames => {
+        this.filteredColumns = this.columns.map(column => ({
+          ...column,
+          tasks: column.tasks.filter(task => {
+            const taskWithUsername = tasksWithUsernames.find(t => t.id === task.id);
+            const matchesAssignee = !assignee || (taskWithUsername && taskWithUsername.assigneeUsername.toLowerCase().includes(assignee.toLowerCase()));
+            const matchesDeadline = !daysUntilDeadline || this.calculateDaysUntilDeadline(task.deadline) <= daysUntilDeadline;
+            return matchesAssignee && matchesDeadline;
+          })
+        }));
+        this.cdr.detectChanges(); // Forcer la détection des changements
+      });
+    } else {
+      this.filteredColumns = this.columns.map(column => ({
+        ...column,
+        tasks: column.tasks.filter(task => {
+          const matchesDeadline = !daysUntilDeadline || this.calculateDaysUntilDeadline(task.deadline) <= daysUntilDeadline;
+          return matchesDeadline;
+        })
+      }));
+      this.cdr.detectChanges(); // Forcer la détection des changements
+    }
+  }
+  
+  calculateDaysUntilDeadline(deadline: string): number {
+    const deadlineDate = new Date(deadline);
+    const timeDiff = deadlineDate.getTime() - new Date().getTime();
+    return Math.ceil(timeDiff / (1000 * 3600 * 24));
   }
 
   // Méthode pour supprimer une tâche

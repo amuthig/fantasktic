@@ -1,0 +1,14 @@
+<div class="filter-container">
+    <form [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+      <mat-form-field appearance="fill">
+        <mat-label>Assignee</mat-label>
+        <input matInput formControlName="assignee">
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Days Until Deadline</mat-label>
+        <input matInput formControlName="daysUntilDeadline" type="number">
+      </mat-form-field>
+      <button mat-button type="button" (click)="resetFilters()">Reset</button>
+      <button mat-button color="primary" type="submit">Apply</button>
+    </form>
+  </div>

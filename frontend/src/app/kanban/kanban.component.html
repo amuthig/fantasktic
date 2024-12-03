@@ -1,5 +1,5 @@
 <div class="kanban-board">
-  <div *ngFor="let column of columns; let i = index" class="kanban-column">
+  <div *ngFor="let column of filteredColumns; let i = index" class="kanban-column">
     <h2>{{ column.title }}</h2>
     <div
       cdkDropList

@@ -1,3 +1,4 @@
 <div class="home-container">
-    <app-kanban class="kanban-container"></app-kanban>
-  </div>
+  <app-filter-tasks (filtersChanged)="onFiltersChanged($event)"></app-filter-tasks>
+  <app-kanban class="kanban-container" [filters]="filters"></app-kanban>
+</div>

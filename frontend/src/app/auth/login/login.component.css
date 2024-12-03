@@ -1,13 +1,38 @@
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Assurez-vous que le conteneur prend toute la hauteur de la vue */
+}
+
 mat-card {
-    width: 300px;
-    margin: auto;
-    padding: 20px;
-  }
-  mat-form-field {
-    width: 100%;
-  }
-  button {
-    width: 100%;
-    margin-top: 10px;
-  }
-  
+  width: 300px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo {
+  font-size: 24px; /* Taille de la police pour le logo */
+  font-weight: bold; /* Mettre le texte en gras */
+  margin-bottom: 20px; /* Ajouter un espace sous le logo */
+  cursor: pointer; /* Changer le curseur pour indiquer que c'est cliquable */
+}
+
+mat-card-title {
+  margin-bottom: 10px; /* Ajouter un espace sous le titre */
+}
+
+.form-field {
+  margin-top: 10px; /* Ajouter un espace au-dessus du premier champ de formulaire */
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+button {
+  width: 100%;
+  margin-top: 10px;
+}

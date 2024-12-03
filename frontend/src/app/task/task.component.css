@@ -1,18 +1,27 @@
 .task {
-  margin: 10px;
+  margin: 5px 0; /* Réduire la marge pour réduire l'écart entre les cartes */
 }
 
 .mat-card-title {
-  font-size: 16px; /* Réduire la taille de la police du titre */
+  font-size: 14px; /* Taille de la police du titre */
+  line-height: 1.1; /* Réduire l'écart entre les lignes */
+  font-weight: bold; /* Mettre le titre en gras */
 }
 
-.mat-card-content p {
-  font-size: 14px; /* Réduire la taille de la police du contenu */
-  margin-bottom: 8px; /* Ajuster la marge inférieure pour réduire l'espacement */
+.text-title {
+  font-size: 16px; /* Taille de la police du titre */
+  line-height: 1.1; /* Réduire l'écart entre les lignes */
+  font-weight: bold; /* Mettre le titre en gras */
 }
 
-.mat-card-content p.assigned-to {
-  margin-bottom: 4px; /* Réduire l'espacement spécifique pour "Assigned To" */
+.text-content {
+  font-size: 15px; /* Taille de la police du contenu */
+  margin-bottom: 4px; /* Marge inférieure pour améliorer l'espacement */
+  line-height: 1.1; /* Réduire l'écart entre les lignes */
+}
+
+.text-content.assigned-to {
+  margin-bottom: 2px; /* Espacement spécifique pour "Assigned To" */
 }
 
 .mat-card-actions {
@@ -41,6 +50,7 @@
 }
 
 .created-by {
-  font-size: 12px; /* Taille de la police plus petite pour le "Created By" */
-  color: gray; /* Couleur grise pour le "Created By" */
+  font-size: 12px; /* Taille de la police pour le "Created By" */
+  color: rgb(124, 126, 136); /* Couleur grise pour le "Created By" */
+  line-height: 1.1; /* Réduire l'écart entre les lignes */
 }

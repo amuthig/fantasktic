@@ -1,12 +1,12 @@
 <mat-card class="task">
   <mat-card-header>
-    <mat-card-title>{{ task.title }}</mat-card-title>
+    <mat-card-title class="text-title">{{ task.title }}</mat-card-title>
   </mat-card-header>
   <mat-card-content>
-    <p>{{ task.description }}</p>
-    <p class="assigned-to"><strong>Assigned To:</strong> {{ assignedToUsername }}</p>
-    <p><strong>Deadline:</strong> {{ task.deadline | date }}</p>
-    <p class="created-by"><strong>Created By:</strong> {{ createdByUsername }}</p>
+    <p class="text-content">{{ task.description }}</p>
+    <p class="text-content assigned-to"><strong>Assigned to:</strong> {{ assignedToUsername }}</p>
+    <p class="text-content"><strong>Deadline:</strong> {{ task.deadline | date }}</p>
+    <p class="text-content created-by"><strong>Created By:</strong> {{ createdByUsername }}</p>
   </mat-card-content>
   <mat-card-actions>
     <button mat-flat-button color="primary" class="edit-button" (click)="openEditDialog()">Edit</button>

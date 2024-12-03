@@ -4,6 +4,7 @@ import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './auth/login/login.component';
 import { SignupComponent } from './auth/signup/signup.component';
 import { AuthService } from './auth/auth.service';
+import { EditProfileComponent } from './edit-profile/edit-profile.component';
 
 // Définir le garde de route
 const authGuard: CanActivateFn = (route, state) => {
@@ -19,6 +20,7 @@ const authGuard: CanActivateFn = (route, state) => {
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, canActivate: [authGuard] },
+  { path: 'profile', component: EditProfileComponent, canActivate: [authGuard] },
   { path: 'login', component: LoginComponent },
   { path: 'signup', component: SignupComponent },
   { path: '**', redirectTo: '', pathMatch: 'full' }

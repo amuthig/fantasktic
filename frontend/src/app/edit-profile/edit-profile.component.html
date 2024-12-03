@@ -1,0 +1,36 @@
+<mat-card>
+  <mat-card-title>Edit User</mat-card-title>
+  <form [formGroup]="editUserForm">
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Username</mat-label>
+      <input matInput formControlName="username">
+      <mat-error *ngIf="editUserForm.get('username')?.hasError('required')">Username is required</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Password</mat-label>
+      
+      <input type="password" matInput formControlName="password">
+      <mat-error *ngIf="editUserForm.get('password')?.hasError('required')">Password is required</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email">
+      <mat-error *ngIf="editUserForm.get('email')?.hasError('required')">Email is required</mat-error>
+      <mat-error *ngIf="editUserForm.get('email')?.hasError('email')">Invalid email</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>First Name</mat-label>
+      <input matInput formControlName="firstName">
+      <mat-error *ngIf="editUserForm.get('firstName')?.hasError('required')">First Name is required</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Last Name</mat-label>
+      <input matInput formControlName="lastName">
+      <mat-error *ngIf="editUserForm.get('lastName')?.hasError('required')">Last Name is required</mat-error>
+    </mat-form-field>
+    <div class="mat-dialog-actions">
+      <button mat-button (click)="onCancel()">Cancel</button>
+      <button mat-button color="primary" (click)="onSave()">Save</button>
+    </div>
+  </form>
+</mat-card>

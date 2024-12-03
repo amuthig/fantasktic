@@ -1,9 +1,9 @@
 package com.fantastik.fantastik.model;
 
-import java.math.BigInteger;
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
 
@@ -28,13 +28,18 @@ public class Tasks {
     private int stage;
 
     @Column(nullable = false)
-    private BigInteger createdById;
+    private Long createdById;
 
     @Column(nullable = false)
     private Date deadline;
 
-    @JsonIgnore
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
     private Users user;
+
+    @JsonProperty("user_id")
+    public Long getUserId() {
+        return user != null ? user.getId() : null;
+    }
 }

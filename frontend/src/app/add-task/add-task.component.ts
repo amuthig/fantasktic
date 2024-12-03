@@ -54,7 +54,7 @@ export class AddTaskComponent implements OnInit {
       title: ['', Validators.required],
       description: ['', Validators.required],
       stage: [0], // Default to Backlog
-      createdById: ['', Validators.required],
+      user_id: ['', Validators.required],
       deadline: [null, Validators.required] // Datepicker field
     });
   }
@@ -72,7 +72,10 @@ export class AddTaskComponent implements OnInit {
 
   onSave(): void {
     if (this.addTaskForm.valid) {
-      const newTask = this.addTaskForm.value;
+      const newTask = {
+        ...this.addTaskForm.value,
+        createdById: null 
+      };
       this.tasksService.addTask(newTask).subscribe({
         next: (task) => this.dialogRef.close(task),
         error: (err) => console.error('Error saving task:', err)

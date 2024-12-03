@@ -20,6 +20,7 @@ export class TaskComponent implements OnInit {
   @Output() update = new EventEmitter<any>();
 
   createdByUsername: string | undefined;
+  assignedToUsername: string | undefined;
 
   constructor(
     private tasksService: TasksService,
@@ -29,6 +30,7 @@ export class TaskComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadCreatedByUsername();
+    this.loadAssignedToUsername();
   }
 
   // Méthode pour charger le nom d'utilisateur du créateur
@@ -36,6 +38,17 @@ export class TaskComponent implements OnInit {
     this.usersService.getUserById(this.task.createdById).subscribe(user => {
       this.createdByUsername = user.username;
     });
+  }
+
+  // Méthode pour charger le nom d'utilisateur de l'utilisateur assigné
+  loadAssignedToUsername(): void {
+    if (this.task.user_id) {
+      this.usersService.getUserById(this.task.user_id).subscribe(user => {
+        this.assignedToUsername = user.username;
+      });
+    } else {
+      this.assignedToUsername = 'Unassigned';
+    }
   }
 
   // Méthode pour ouvrir le dialog de modification
@@ -53,8 +66,10 @@ export class TaskComponent implements OnInit {
           this.task.stage = updatedTask.stage;
           this.task.createdById = updatedTask.createdById;
           this.task.deadline = updatedTask.deadline;
+          this.task.user = updatedTask.user;
           this.update.emit(updatedTask);
           this.loadCreatedByUsername(); // Recharger le nom d'utilisateur après la mise à jour
+          this.loadAssignedToUsername(); // Recharger le nom d'utilisateur assigné après la mise à jour
         });
       }
     });

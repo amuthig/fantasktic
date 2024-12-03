@@ -2,6 +2,8 @@ package com.fantastik.fantastik.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -30,6 +32,6 @@ public class Users {
     private String lastName;
 
     @OneToMany(mappedBy = "user")
+    @JsonManagedReference
     private List<Tasks> tasks;
-
 }

@@ -39,6 +39,7 @@ export class KanbanComponent implements OnInit {
       this.columns.forEach(column => column.tasks = []); // Réinitialiser les colonnes
       tasks.forEach((task: any) => {
         this.columns[task.stage].tasks.push(task);
+        console.log(task); // Afficher la tâche dans la console
       });
       this.cdr.detectChanges(); // Forcer la détection des changements
     });
@@ -81,5 +82,22 @@ export class KanbanComponent implements OnInit {
       const task = currentColumn.splice(event.previousIndex, 1)[0];
       currentColumn.splice(event.currentIndex, 0, task);
     }
+  }
+
+  // Ouvre le dialog pour ajouter une tâche
+  openAddTaskDialog(): void {
+    const dialogRef = this.dialog.open(AddTaskComponent, {
+      width: '400px'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.tasksService.addTask(result).subscribe(newTask => {
+          this.columns[newTask.stage].tasks.push(newTask); // Ajouter la nouvelle tâche à la colonne appropriée
+          this.tasksService.notifyTaskUpdates(); // Notifier les mises à jour des tâches
+          this.cdr.detectChanges(); // Forcer la détection des changements
+        });
+      }
+    });
   }
 }

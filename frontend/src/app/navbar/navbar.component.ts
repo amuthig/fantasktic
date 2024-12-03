@@ -48,12 +48,5 @@ export class NavbarComponent implements OnInit {
     const dialogRef = this.dialog.open(AddTaskComponent, {
       width: '400px'
     });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        // Logique pour ajouter la tâche
-        console.log('Nouvelle tâche ajoutée :', result);
-      }
-    });
   }
 }

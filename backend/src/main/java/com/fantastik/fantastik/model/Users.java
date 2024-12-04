@@ -5,11 +5,15 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "users")
 @Data
+@NoArgsConstructor // Génère le constructeur sans paramètre
+@AllArgsConstructor // Génère le constructeur avec tous les paramètres
 public class Users {
 
     @Id

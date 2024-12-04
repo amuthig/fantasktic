@@ -26,6 +26,12 @@ public class UsersController {
     // CREATE
     @PostMapping
     public ResponseEntity<Users> createUser(@RequestBody Users user) {
+        if (user.getUsername() == null || user.getUsername().isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if (user.getPassword() == null || user.getPassword().isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         Users newUser = usersService.createUser(user);
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
@@ -48,7 +54,25 @@ public class UsersController {
     // UPDATE
     @PutMapping("/{id}")
     public ResponseEntity<Users> updateUser(@PathVariable Long id, @RequestBody Users userDetails) {
-        Users updatedUser = usersService.updateUser(id, userDetails);
+        Optional<Users> existingUser = usersService.getUserById(id);
+        if (!existingUser.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        if (userDetails.getUsername() != null && !userDetails.getUsername().isEmpty()) {
+            existingUser.get().setUsername(userDetails.getUsername());
+        }
+        if (userDetails.getPassword() != null && !userDetails.getPassword().isEmpty()) {
+            existingUser.get().setPassword(userDetails.getPassword());
+        }
+        if (userDetails.getFirstName() != null) {
+            existingUser.get().setFirstName(userDetails.getFirstName());
+        }
+        if (userDetails.getLastName() != null) {
+            existingUser.get().setLastName(userDetails.getLastName());
+        }
+
+        Users updatedUser = usersService.updateUser(id, existingUser.get());
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
@@ -64,11 +88,7 @@ public class UsersController {
     public ResponseEntity<Users> getCurrentUser(@RequestHeader("Authorization") String token) {
         String username = jwtUtil.extractUsername(token.substring(7)); // Supposons que le token commence par "Bearer "
         Optional<Users> user = usersService.getUserByUsername(username);
-        if (user.isPresent()) {
-            return new ResponseEntity<>(user.get(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return user.map(u -> new ResponseEntity<>(u, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
-
 }

@@ -1,11 +1,11 @@
 <div class="filter-container">
   <form [formGroup]="filterForm" (ngSubmit)="applyFilters()">
     <mat-form-field appearance="fill">
-      <mat-label>Assignee</mat-label>
+      <mat-label>Assigned to</mat-label>
       <input matInput formControlName="assignee">
     </mat-form-field>
     <mat-form-field appearance="fill">
-      <mat-label>Days Until Deadline</mat-label>
+      <mat-label>max deadline</mat-label>
       <input matInput formControlName="daysUntilDeadline" type="number" min="0">
       <mat-error *ngIf="filterForm.get('daysUntilDeadline')?.hasError('min')">
         Days Until Deadline cannot be negative

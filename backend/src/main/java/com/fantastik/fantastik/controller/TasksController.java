@@ -36,38 +36,45 @@ public class TasksController {
     @PostMapping
     public ResponseEntity<Tasks> createTask(@RequestBody Map<String, Object> taskData,
             @RequestHeader("Authorization") String token) {
-        // getting the user from the token
-        String username = jwtUtil.extractUsername(token.substring(7));
-        Users createdBy = userService.getUserByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        Long createdById = createdBy.getId();
+        try {
+            // getting the user from the token
+            String username = jwtUtil.extractUsername(token.substring(7));
+            Users createdBy = userService.getUserByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            Long createdById = createdBy.getId();
 
-        // Créer une nouvelle tâche et définir ses propriétés
-        Tasks task = new Tasks();
-        task.setTitle((String) taskData.get("title"));
-        task.setDescription((String) taskData.get("description"));
-        task.setStage((Integer) taskData.get("stage"));
-        task.setCreatedById(createdById);
+            // Créer une nouvelle tâche et définir ses propriétés
+            Tasks task = new Tasks();
+            task.setTitle((String) taskData.getOrDefault("title", ""));
+            task.setDescription((String) taskData.getOrDefault("description", ""));
 
-        // Récupérer l'utilisateur assigné à la tâche
-        Long user_id = ((Number) taskData.get("user_id")).longValue();
-        Users assignee = userService.getUserById(user_id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        task.setUser(assignee);
+            if (taskData.get("stage") != null) {
+                task.setStage(((Number) taskData.get("stage")).intValue());
+            }
+            task.setCreatedById(createdById);
 
-        // Définir la deadline si elle est présente
-        if (taskData.get("deadline") != null) {
-            try {
+            // Récupérer l'utilisateur assigné à la tâche
+            if (taskData.get("user_id") != null) {
+                Long user_id = ((Number) taskData.get("user_id")).longValue();
+                Users assignee = userService.getUserById(user_id)
+                        .orElseThrow(() -> new RuntimeException("User not found"));
+                task.setUser(assignee);
+            }
+
+            // Définir la deadline si elle est présente
+            if (taskData.get("deadline") != null) {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 Date deadline = dateFormat.parse((String) taskData.get("deadline"));
                 task.setDeadline(deadline);
-            } catch (ParseException e) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
-        }
 
-        Tasks newTask = tasksService.createTask(task);
-        return new ResponseEntity<>(newTask, HttpStatus.CREATED);
+            Tasks newTask = tasksService.createTask(task);
+            return new ResponseEntity<>(newTask, HttpStatus.CREATED);
+        } catch (ParseException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     // READ - Get all tasks
@@ -94,25 +101,26 @@ public class TasksController {
         }
 
         Tasks task = existingTask.get();
-        task.setTitle((String) taskData.get("title"));
-        task.setDescription((String) taskData.get("description"));
-        task.setStage((Integer) taskData.get("stage"));
 
-        // Vérifier si createdById est présent
-        if (taskData.get("createdById") != null) {
+        if (taskData.containsKey("title")) {
+            task.setTitle((String) taskData.get("title"));
+        }
+        if (taskData.containsKey("description")) {
+            task.setDescription((String) taskData.get("description"));
+        }
+        if (taskData.containsKey("stage") && taskData.get("stage") != null) {
+            task.setStage(((Number) taskData.get("stage")).intValue());
+        }
+        if (taskData.containsKey("createdById") && taskData.get("createdById") != null) {
             task.setCreatedById(((Number) taskData.get("createdById")).longValue());
         }
-
-        // Récupérer l'utilisateur assigné à la tâche
-        if (taskData.get("user_id") != null) {
+        if (taskData.containsKey("user_id") && taskData.get("user_id") != null) {
             Long user_id = ((Number) taskData.get("user_id")).longValue();
             Users assignee = userService.getUserById(user_id)
                     .orElseThrow(() -> new RuntimeException("User not found"));
             task.setUser(assignee);
         }
-
-        // Définir la deadline si elle est présente
-        if (taskData.get("deadline") != null) {
+        if (taskData.containsKey("deadline") && taskData.get("deadline") != null) {
             try {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 Date deadline = dateFormat.parse((String) taskData.get("deadline"));

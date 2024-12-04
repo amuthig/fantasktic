@@ -9,4 +9,6 @@
 mat-form-field {
   margin-bottom: 0; /* Enlever la marge en bas des champs de saisie */
   margin-right: 16px; /* Ajouter de l'espace entre les champs */
+  margin-left: 16px;
+  width: 200px; /* Réduire la taille des champs de saisie */
 }

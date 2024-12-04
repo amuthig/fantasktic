@@ -32,8 +32,9 @@ export class TasksService {
         
 
         const emailData = {
+          from: 'dev@example.com',
           to: 'test@example.com', 
-          subject: 'Nouvelle tâche ajoutée',
+          subject: 'Vous avez un nouveau ticket',
           text: `Une nouvelle tâche a été ajoutée :\n\nTitre : ${task.title}\nDescription : ${task.description}`
         };
         console.log(emailData);

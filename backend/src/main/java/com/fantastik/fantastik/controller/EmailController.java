@@ -18,10 +18,13 @@ public class EmailController {
     // Endpoint pour envoyer un email avec des données JSON envoyées dans le corps
     // de la requête
     @PostMapping("/send-email")
-    public String sendEmail(@RequestBody EmailRequest emailRequest) {
+    public EmailResponse sendEmail(@RequestBody EmailRequest emailRequest) {
         // Appeler le service d'email pour envoyer l'email avec les informations reçues
-        emailService.sendEmail(emailRequest.getTo(), emailRequest.getSubject(), emailRequest.getText());
-        return "Email sent successfully!";
+        emailService.sendEmail(emailRequest.getFrom(), emailRequest.getTo(), emailRequest.getSubject(),
+                emailRequest.getText());
+
+        // Retourner une réponse JSON avec un message de succès
+        return new EmailResponse("Email sent successfully!");
     }
 
     // Classe pour représenter la requête email
@@ -29,8 +32,18 @@ public class EmailController {
         private String to;
         private String subject;
         private String text;
+        private String from;
 
         // Getters et Setters
+
+        public String getFrom() {
+            return from;
+        }
+
+        public void setFrom(String from) {
+            this.from = from;
+        }
+
         public String getTo() {
             return to;
         }
@@ -53,6 +66,23 @@ public class EmailController {
 
         public void setText(String text) {
             this.text = text;
+        }
+    }
+
+    // Classe pour représenter la réponse de l'email
+    public static class EmailResponse {
+        private String message;
+
+        public EmailResponse(String message) {
+            this.message = message;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
         }
     }
 }

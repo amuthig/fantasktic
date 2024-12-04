@@ -1,6 +1,11 @@
 <div class="kanban-board">
   <div *ngFor="let column of filteredColumns; let i = index" class="kanban-column">
-    <h2>{{ column.title }}</h2>
+    <div class="column-header">
+      <h2>{{ column.title }}</h2>
+      <button mat-icon-button color="primary" class="add-task-button" (click)="openAddTaskDialog(i)">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
     <div
       cdkDropList
       [cdkDropListData]="column.tasks"

@@ -1,5 +1,5 @@
 import { Component, Output, EventEmitter } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
@@ -30,12 +30,18 @@ export class FilterTasksComponent {
   constructor(private fb: FormBuilder) {
     this.filterForm = this.fb.group({
       assignee: [''],
-      daysUntilDeadline: ['']
+      daysUntilDeadline: ['', [Validators.min(0)]]
     });
   }
 
   applyFilters(): void {
-    this.filtersChanged.emit(this.filterForm.value);
+    if (this.filterForm.valid) {
+      this.filtersChanged.emit(this.filterForm.value);
+    }
+  }
+
+  ngOnInit(): void {
+    this.resetFilters(); // Appliquer les filtres par défaut lors du chargement de la page
   }
 
   resetFilters(): void {

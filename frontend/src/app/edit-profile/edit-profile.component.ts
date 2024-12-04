@@ -80,5 +80,6 @@ export class EditProfileComponent implements OnInit {
 
   onCancel(): void {
     console.log('Modification annulée');
+    this.router.navigate(['']);
   }
 }

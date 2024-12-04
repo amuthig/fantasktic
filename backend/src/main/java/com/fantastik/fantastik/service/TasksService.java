@@ -21,8 +21,10 @@ public class TasksService {
      * @param task La tâche à ajouter.
      * @return La tâche ajoutée.
      */
-
     public Tasks createTask(Tasks task) {
+        if (task.getStage() < 0 || task.getStage() > 3) {
+            task.setStage(0); // Affecter 0 à stage si la valeur est <0 ou >3
+        }
         return tasksRepository.save(task);
     }
 
@@ -56,7 +58,11 @@ public class TasksService {
         Tasks task = tasksRepository.findById(id).orElseThrow(() -> new RuntimeException("Task not found"));
         task.setTitle(taskDetails.getTitle());
         task.setDescription(taskDetails.getDescription());
-        task.setStage(taskDetails.getStage());
+        if (taskDetails.getStage() < 0 || taskDetails.getStage() > 3) {
+            task.setStage(0); // Affecter 0 à stage si la valeur est <0 ou >3
+        } else {
+            task.setStage(taskDetails.getStage());
+        }
         task.setDeadline(taskDetails.getDeadline());
         task.setCreatedById(taskDetails.getCreatedById());
         return tasksRepository.save(task);

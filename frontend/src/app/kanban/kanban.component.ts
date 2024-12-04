@@ -6,15 +6,15 @@ import { TasksService } from '../task.service';
 import { MatDialog } from '@angular/material/dialog';
 import { AddTaskComponent } from '../add-task/add-task.component';
 import { UsersService } from '../users.service';
+import { MatIconModule } from '@angular/material/icon';
 
 import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-
 @Component({
   selector: 'app-kanban',
   standalone: true,
-  imports: [NgFor, DragDropModule, TaskComponent],
+  imports: [NgFor, DragDropModule, TaskComponent, MatIconModule],
   templateUrl: './kanban.component.html',
   styleUrls: ['./kanban.component.css'],
 })
@@ -44,15 +44,16 @@ export class KanbanComponent implements OnInit, OnChanges {
     this.applyFilters();
   }
 
-
-
   // Méthode pour charger les tâches depuis l'API
   loadTasks(): void {
     this.tasksService.getTasks().subscribe((tasks: any[]) => {
       this.columns.forEach(column => column.tasks = []); // Réinitialiser les colonnes
       tasks.forEach((task: any) => {
-        this.columns[task.stage].tasks.push(task);
-        console.log(task); // Afficher la tâche dans la console
+        if (task.stage >= 0 && task.stage < this.columns.length) {
+          this.columns[task.stage].tasks.push(task);
+        } else {
+          console.error(`Invalid stage value for task in loadTasks: ${task.id}`, task);
+        }
       });
       this.applyFilters();
       this.cdr.detectChanges(); // Forcer la détection des changements
@@ -114,7 +115,11 @@ export class KanbanComponent implements OnInit, OnChanges {
         column.tasks.splice(taskIndex, 1);
       }
     });
-    this.columns[updatedTask.stage].tasks.push(updatedTask);
+    if (updatedTask.stage >= 0 && updatedTask.stage < this.columns.length) {
+      this.columns[updatedTask.stage].tasks.push(updatedTask);
+    } else {
+      console.error(`Invalid stage value for task in updateTask: ${updatedTask.id}`, updatedTask);
+    }
     this.tasksService.notifyTaskUpdates(); // Notifier les mises à jour des tâches
   }
 
@@ -125,12 +130,16 @@ export class KanbanComponent implements OnInit, OnChanges {
 
     if (event.previousContainer !== event.container) {
       const task = previousColumn.splice(event.previousIndex, 1)[0];
-      task.stage = this.columns.indexOf(column); // Mettre à jour le stage de la tâche
-      currentColumn.splice(event.currentIndex, 0, task);
-      console.log(`Tâche déplacée vers la colonne : ${column.title}`); // Afficher la colonne dans la console
-      this.tasksService.updateTask(task.id, task).subscribe(updatedTask => {
-        this.updateTask(updatedTask); // Mettre à jour l'interface utilisateur avec la tâche mise à jour
-      });
+      const newStage = this.columns.findIndex(col => col.title === column.title); // Calculer l'index de la colonne
+      if (newStage >= 0 && newStage < this.columns.length) {
+        task.stage = newStage; // Mettre à jour le stage de la tâche
+        currentColumn.splice(event.currentIndex, 0, task);
+        this.tasksService.updateTask(task.id, task).subscribe(updatedTask => {
+          this.updateTask(updatedTask); // Mettre à jour l'interface utilisateur avec la tâche mise à jour
+        });
+      } else {
+        console.error(`Invalid stage value for task: ${task.id}`, task);
+      }
     } else {
       const task = currentColumn.splice(event.previousIndex, 1)[0];
       currentColumn.splice(event.currentIndex, 0, task);
@@ -138,19 +147,13 @@ export class KanbanComponent implements OnInit, OnChanges {
   }
 
   // Ouvre le dialog pour ajouter une tâche
-  openAddTaskDialog(): void {
+  openAddTaskDialog(stage: number): void {
     const dialogRef = this.dialog.open(AddTaskComponent, {
-      width: '400px'
+      width: '400px',
+      data: { stage } // Passer la valeur de stage au composant AddTaskComponent
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.tasksService.addTask(result).subscribe(newTask => {
-          this.columns[newTask.stage].tasks.push(newTask); // Ajouter la nouvelle tâche à la colonne appropriée
-          this.tasksService.notifyTaskUpdates(); // Notifier les mises à jour des tâches
-          this.cdr.detectChanges(); // Forcer la détection des changements
-        });
-      }
-    });
+
+    
   }
 }

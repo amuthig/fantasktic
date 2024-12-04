@@ -1,5 +1,5 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
+import { Component, OnInit, Inject, ChangeDetectionStrategy } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -43,17 +43,18 @@ interface User {
 export class AddTaskComponent implements OnInit {
   addTaskForm: FormGroup;
   users: User[] = [];
+  isSaving = false; // Ajout d'un indicateur pour éviter les doublons
 
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<AddTaskComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any, // Injecter les données passées
     private tasksService: TasksService,
     private usersService: UsersService
   ) {
     this.addTaskForm = this.fb.group({
       title: ['', Validators.required],
       description: ['', Validators.required],
-      stage: [0], // Default to Backlog
       user_id: ['', Validators.required],
       deadline: [null, Validators.required] // Datepicker field
     });
@@ -71,16 +72,39 @@ export class AddTaskComponent implements OnInit {
   }
 
   onSave(): void {
-    if (this.addTaskForm.valid) {
+    if (this.addTaskForm.valid && !this.isSaving) {
+      console.log('Saving task...'); // Log pour vérifier l'appel
+      this.isSaving = true; // Empêcher les doublons
       const newTask = {
         ...this.addTaskForm.value,
-        createdById: null 
+        deadline: this.formatDate(this.addTaskForm.value.deadline), // Formater la date correctement
+        stage: this.data.stage, // Utiliser la valeur de stage passée en paramètre
+        createdById: null // Ajouter l'ID de l'utilisateur créateur si nécessaire
       };
       this.tasksService.addTask(newTask).subscribe({
-        next: (task) => this.dialogRef.close(task),
-        error: (err) => console.error('Error saving task:', err)
+        next: (task) => {
+          console.log('Task saved:', task); // Log pour vérifier la sauvegarde
+          this.isSaving = false; // Réinitialiser l'indicateur
+          this.dialogRef.close(task);
+        },
+        error: (err) => {
+          this.isSaving = false; // Réinitialiser l'indicateur en cas d'erreur
+          console.error('Error saving task:', err);
+        }
       });
     }
+  }
+
+  formatDate(date: Date): string {
+    const d = new Date(date);
+    let month = '' + (d.getMonth() + 1);
+    let day = '' + d.getDate();
+    const year = d.getFullYear();
+
+    if (month.length < 2) month = '0' + month;
+    if (day.length < 2) day = '0' + day;
+
+    return [year, month, day].join('-');
   }
 
   onCancel(): void {

@@ -16,15 +16,6 @@
       </mat-error>
     </mat-form-field>
     <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Stage</mat-label>
-      <mat-select formControlName="stage">
-        <mat-option [value]="0">Backlog</mat-option>
-        <mat-option [value]="1">In Progress</mat-option>
-        <mat-option [value]="2">Review</mat-option>
-        <mat-option [value]="3">Done</mat-option>
-      </mat-select>
-    </mat-form-field>
-    <mat-form-field appearance="fill" class="full-width">
       <mat-label>Assigned to:</mat-label>
       <mat-select formControlName="user_id" required>
         <mat-option *ngFor="let user of users" [value]="user.id">{{ user.username }}</mat-option>
@@ -47,5 +38,5 @@
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button (click)="onCancel()">Cancel</button>
-  <button mat-button color="primary" (click)="onSave()" [disabled]="addTaskForm.invalid">Save</button>
+  <button mat-button color="primary" (click)="onSave()" [disabled]="addTaskForm.invalid || isSaving">Save</button>
 </mat-dialog-actions>

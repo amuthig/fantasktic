@@ -2,24 +2,12 @@
   <!-- Logo à gauche -->
   <span class="logo" style="cursor: pointer;" [routerLink]="['/']">Fantasktic</span>
 
-  <!-- Navigation à droite -->
+  <span class="spacer"></span>
+
+
   
-  <!-- Bouton Ajouter une tâche -->
-     <span class="spacer"></span>
-  <button mat-button class="nav-item" (click)="openAddTaskDialog()">Create a new task</button>
-
-<!-- 
-  <button mat-button [matMenuTriggerFor]="projectsMenu" class="nav-item">Projects</button>
-  <mat-menu #projectsMenu="matMenu">
-    <button mat-menu-item>Project 1</button>
-    <button mat-menu-item>Project 2</button>
-    <button mat-menu-item>Project 3</button>
-  </mat-menu> -->
-
   <button mat-button class="nav-item" [routerLink]="['/profile']">My Profile</button>
 
- 
-  <!-- Bouton Login/Logout -->
   <button 
     mat-button 
     class="nav-item" 

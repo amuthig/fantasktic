@@ -1,10 +1,12 @@
 .filter-container {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding-bottom: 0; /* Enlever le padding en bas */
-  }
-  
-  mat-form-field {
-    margin-bottom: 0; /* Enlever la marge en bas des champs de saisie */
-  }
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 0; /* Enlever le padding en bas */
+  margin-top: 16px; /* Ajouter de l'espace au-dessus des champs */
+}
+
+mat-form-field {
+  margin-bottom: 0; /* Enlever la marge en bas des champs de saisie */
+  margin-right: 16px; /* Ajouter de l'espace entre les champs */
+}

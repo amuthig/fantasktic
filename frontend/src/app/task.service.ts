@@ -7,35 +7,60 @@ import { AuthService } from './auth/auth.service';
   providedIn: 'root',
 })
 export class TasksService {
-  private apiUrl = 'http://localhost:8080/api/tasks'; // URL de l'API Spring Boot
-  private taskUpdates = new Subject<void>(); // Subject pour les mises à jour des tâches
+  private apiUrl = 'http://localhost:8080/api/tasks';
+  private emailUrl = 'http://localhost:8080/send-email';
+  private taskUpdates = new Subject<void>();
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
-  // Méthode pour récupérer toutes les tâches
   getTasks(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl);
   }
 
-  // Méthode pour ajouter une nouvelle tâche
+
   addTask(task: any): Observable<any> {
-    const token = this.authService.getToken(); // Supposons que vous avez une méthode pour obtenir le token
+    const token = this.authService.getToken(); 
     if (!token) {
       throw new Error('Token is null');
     }
 
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
     return this.http.post<any>(this.apiUrl, task, { headers }).pipe(
-      tap(() => this.notifyTaskUpdates()) // Notifier les mises à jour des tâches après l'ajout
+      tap(() => {
+        this.notifyTaskUpdates();
+        
+
+        const emailData = {
+          to: 'test@example.com', 
+          subject: 'Nouvelle tâche ajoutée',
+          text: `Une nouvelle tâche a été ajoutée :\n\nTitre : ${task.title}\nDescription : ${task.description}`
+        };
+        console.log(emailData);
+
+        // Appeler l'API pour envoyer l'email
+        this.sendEmail(emailData).subscribe(
+          response => {
+            console.log('Email envoyé avec succès', response);
+          },
+          error => {
+            console.error('Erreur lors de l\'envoi de l\'email', error);
+          }
+        );
+      })
     );
   }
 
-  // Méthode pour notifier les mises à jour des tâches
+  // Méthode pour envoyer un email via l'API backend
+  private sendEmail(emailData: any): Observable<any> {
+    return this.http.post<any>(this.emailUrl, emailData);
+  }
+
+ 
   notifyTaskUpdates(): void {
     this.taskUpdates.next();
   }
 
-  // Observable pour les mises à jour des tâches
   getTaskUpdates(): Observable<void> {
     return this.taskUpdates.asObservable();
   }
@@ -53,4 +78,5 @@ export class TasksService {
       tap(() => this.notifyTaskUpdates()) // Notifier les mises à jour des tâches après la mise à jour
     );
   }
+  
 }

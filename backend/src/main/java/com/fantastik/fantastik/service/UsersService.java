@@ -12,97 +12,120 @@ import com.fantastik.fantastik.model.Users;
 import com.fantastik.fantastik.repository.UsersRepository;
 import com.fantastik.fantastik.util.JwtUtil;
 
+/**
+ * Service for managing user accounts.
+ * Provides methods for CRUD operations and user registration with JWT token
+ * generation.
+ */
 @Service
 public class UsersService {
 
     @Autowired
-    private UsersRepository usersRepository;
+    private UsersRepository usersRepository; // Repository for interacting with user data.
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder; // Encoder for hashing user passwords.
 
     @Autowired
-    private JwtUtil jwtUtil;
+    private JwtUtil jwtUtil; // Utility for generating JWT tokens.
 
+    /**
+     * Registers a new user, encrypting their password and generating a JWT token.
+     *
+     * @param user The user to register.
+     * @return A JWT token for the registered user.
+     * @throws DataIntegrityViolationException If the username or email already
+     *                                         exists.
+     */
     public String registerUser(Users user) {
         try {
-            // Chiffrer le mot de passe
+            // Encrypt the user's password before saving.
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             usersRepository.save(user);
-            // Générer un token JWT
+            // Generate a JWT token for the registered user.
             return jwtUtil.generateToken(user.getUsername());
         } catch (DataIntegrityViolationException ex) {
+            // Handle unique constraint violations on username or email.
             throw new DataIntegrityViolationException("Nom d'utilisateur ou email existe déjà.");
         }
     }
 
     /**
-     * CREATE: Ajouter un nouvel utilisateur.
+     * CREATE: Adds a new user to the system.
      *
-     * @param user L'utilisateur à ajouter.
-     * @return L'utilisateur ajouté.
+     * @param user The user to add.
+     * @return The saved user.
      */
     public Users createUser(Users user) {
-        // Encoder le mot de passe avant d'enregistrer l'utilisateur
+        // Encrypt the user's password before saving.
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return usersRepository.save(user);
     }
 
     /**
-     * READ: Récupérer tous les utilisateurs.
+     * READ: Retrieves all users in the system.
      *
-     * @return La liste des utilisateurs.
+     * @return A list of all users.
      */
     public List<Users> getAllUsers() {
         return usersRepository.findAll();
     }
 
     /**
-     * READ: Récupérer un utilisateur par son ID.
+     * READ: Retrieves a user by their ID.
      *
-     * @param id L'ID de l'utilisateur.
-     * @return L'utilisateur trouvé ou une exception si introuvable.
+     * @param id The ID of the user.
+     * @return The user wrapped in an Optional, or an empty Optional if not found.
      */
     public Optional<Users> getUserById(Long id) {
         return usersRepository.findById(id);
     }
 
     /**
-     * READ: Récupérer un utilisateur par son username.
+     * READ: Retrieves a user by their username.
      *
-     * @param username Le nom d'utilisateur.
-     * @return L'utilisateur trouvé ou une exception si introuvable.
+     * @param username The username of the user.
+     * @return The user wrapped in an Optional, or an empty Optional if not found.
      */
     public Optional<Users> getUserByUsername(String username) {
         return usersRepository.findByUsername(username);
     }
 
     /**
-     * UPDATE: Mettre à jour les informations d'un utilisateur.
+     * UPDATE: Updates the details of an existing user.
      *
-     * @param id          L'ID de l'utilisateur à mettre à jour.
-     * @param userDetails Les nouvelles informations de l'utilisateur.
-     * @return L'utilisateur mis à jour.
+     * @param id          The ID of the user to update.
+     * @param userDetails The new details for the user.
+     * @return The updated user.
+     * @throws RuntimeException If the user with the specified ID is not found.
      */
     public Users updateUser(Long id, Users userDetails) {
+        // Retrieve the user or throw an exception if not found.
         Users user = usersRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Update user details.
         user.setUsername(userDetails.getUsername());
         user.setEmail(userDetails.getEmail());
         user.setFirstName(userDetails.getFirstName());
         user.setLastName(userDetails.getLastName());
+
+        // Update password if provided, after encrypting it.
         if (userDetails.getPassword() != null && !userDetails.getPassword().isEmpty()) {
             user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
         }
-        return usersRepository.save(user);
+
+        return usersRepository.save(user); // Save and return the updated user.
     }
 
     /**
-     * DELETE: Supprimer un utilisateur par son ID.
+     * DELETE: Removes a user by their ID.
      *
-     * @param id L'ID de l'utilisateur à supprimer.
+     * @param id The ID of the user to delete.
+     * @throws RuntimeException If the user with the specified ID is not found.
      */
     public void deleteUser(Long id) {
+        // Retrieve the user or throw an exception if not found.
         Users user = usersRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-        usersRepository.delete(user);
+        usersRepository.delete(user); // Delete the user from the database.
     }
 }

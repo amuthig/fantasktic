@@ -8,33 +8,45 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fantastik.fantastik.service.EmailService;
 
+/**
+ * Controller for handling email-related requests.
+ */
 @RestController
-@CrossOrigin(origins = "http://localhost:4200") // Autoriser les requêtes depuis Angular
+@CrossOrigin(origins = "http://localhost:4200") // Allow requests from the Angular frontend
 public class EmailController {
 
     @Autowired
     private EmailService emailService;
 
-    // Endpoint pour envoyer un email avec des données JSON envoyées dans le corps
-    // de la requête
+    /**
+     * Endpoint to send an email based on JSON data in the request body.
+     *
+     * @param emailRequest The email details provided in the request body.
+     * @return A response indicating whether the email was sent successfully.
+     */
     @PostMapping("/send-email")
     public EmailResponse sendEmail(@RequestBody EmailRequest emailRequest) {
-        // Appeler le service d'email pour envoyer l'email avec les informations reçues
-        emailService.sendEmail(emailRequest.getFrom(), emailRequest.getTo(), emailRequest.getSubject(),
+        // Call the email service to send the email with the provided details
+        emailService.sendEmail(
+                emailRequest.getFrom(),
+                emailRequest.getTo(),
+                emailRequest.getSubject(),
                 emailRequest.getText());
 
-        // Retourner une réponse JSON avec un message de succès
+        // Return a JSON response with a success message
         return new EmailResponse("Email sent successfully!");
     }
 
-    // Classe pour représenter la requête email
+    /**
+     * Class to represent the email request structure.
+     */
     public static class EmailRequest {
         private String to;
         private String subject;
         private String text;
         private String from;
 
-        // Getters et Setters
+        // Getters and Setters
 
         public String getFrom() {
             return from;
@@ -69,7 +81,9 @@ public class EmailController {
         }
     }
 
-    // Classe pour représenter la réponse de l'email
+    /**
+     * Class to represent the email response structure.
+     */
     public static class EmailResponse {
         private String message;
 

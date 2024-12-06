@@ -25,31 +25,41 @@ import { Router } from '@angular/router';
   styleUrls: ['./edit-profile.component.css'],
 })
 export class EditProfileComponent implements OnInit {
-  editUserForm: FormGroup;
-  errorMessage: string | null = null;
-  currentUser: any;
+  editUserForm: FormGroup; // Form group for user profile editing
+  errorMessage: string | null = null; // Holds error messages
+  currentUser: any; // Holds current user data
 
+  // Constructor to initialize form and inject dependencies
   constructor(
-    private fb: FormBuilder,
-    private usersService: UsersService, 
-    private router: Router
+    private fb: FormBuilder, // FormBuilder to create the form
+    private usersService: UsersService, // Service to handle user data
+    private router: Router // Router to navigate between pages
   ) {
+    // Initialize form with fields and validations
     this.editUserForm = this.fb.group({
-      username: ['', Validators.required],
-      password: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required]
+      username: ['', Validators.required], // Username is required
+      password: ['', Validators.required], // Password is required
+      email: ['', [Validators.required, Validators.email]], // Email is required and must be valid
+      firstName: ['', Validators.required], // First name is required
+      lastName: ['', Validators.required] // Last name is required
     });
   }
 
+  /**
+   * Lifecycle hook called on component initialization.
+   * Loads current user data to populate the form.
+   */
   ngOnInit(): void {
-    this.loadCurrentUser();
+    this.loadCurrentUser(); // Load current user details on initialization
   }
 
+  /**
+   * Fetches the current user from the server and populates the form.
+   */
   loadCurrentUser(): void {
     this.usersService.getCurrentUser().subscribe(user => {
-      this.currentUser = user;
+      this.currentUser = user; // Store the current user data
+      // Populate form with current user values
       this.editUserForm.patchValue({
         username: user.username,
         password: user.password,
@@ -58,28 +68,41 @@ export class EditProfileComponent implements OnInit {
         lastName: user.lastName
       });
     }, error => {
+      // Handle error if unable to load user data
       this.errorMessage = 'Failed to load user data';
     });
   }
 
+  /**
+   * Handles the form submission to update the user's profile.
+   * Makes an API call to update the user data on the server.
+   */
   onSave(): void {
+    // Check if the form is valid before submitting
     if (this.editUserForm.valid) {
       const updatedUser = {
-        ...this.editUserForm.value,
-        id: this.currentUser.id
+        ...this.editUserForm.value, // Get the form values
+        id: this.currentUser.id // Include the current user ID
       };
+      
+      // Call the service to update the user data
       this.usersService.updateUser(updatedUser.id, updatedUser).subscribe(() => {
-        alert('User updated successfully');
+        alert('User updated successfully'); // Show success message
       }, error => {
+        // Handle error if unable to update user data
         this.errorMessage = 'Failed to update user data';
       });
     }
 
+    // Navigate back to the home page after saving
     this.router.navigate(['']);
   }
 
+  /**
+   * Cancels the profile edit and navigates back to the home page.
+   */
   onCancel(): void {
-    console.log('Modification annulée');
-    this.router.navigate(['']);
+    console.log('Modification cancelled'); // Log cancellation action
+    this.router.navigate(['']); // Redirect to the home page
   }
 }

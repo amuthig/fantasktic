@@ -7,7 +7,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { AddTaskComponent } from '../add-task/add-task.component';
 import { UsersService } from '../users.service';
 import { MatIconModule } from '@angular/material/icon';
-
 import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -19,47 +18,56 @@ import { map } from 'rxjs/operators';
   styleUrls: ['./kanban.component.css'],
 })
 export class KanbanComponent implements OnInit, OnChanges {
-  @Input() filters: any = {};
+  @Input() filters: any = {}; // Accepts filters from the parent component
   columns = [
     { title: 'Backlog', tasks: [] as any[] },
     { title: 'In Progress', tasks: [] as any[] },
     { title: 'Review', tasks: [] as any[] },
     { title: 'Done', tasks: [] as any[] },
-  ];
+  ]; // Columns for the Kanban board
+  connectedTo: string[] = []; // Stores the drag-and-drop connections for each column
+  filteredColumns = this.columns; // Columns after filtering tasks based on the selected filters
 
-  connectedTo: string[] = [];
-  filteredColumns = this.columns;
-
-  constructor(private usersService: UsersService, private tasksService: TasksService, private dialog: MatDialog, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private usersService: UsersService,
+    private tasksService: TasksService,
+    private dialog: MatDialog,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
-    this.loadTasks();
-    this.connectedTo = this.columns.map((_, index) => 'task-list-' + index);
+    this.loadTasks(); // Loads tasks on initialization
+    this.connectedTo = this.columns.map((_, index) => 'task-list-' + index); // Connects columns for drag-and-drop functionality
     this.tasksService.getTaskUpdates().subscribe(() => {
-      this.loadTasks();
+      this.loadTasks(); // Reload tasks when they are updated
     });
   }
 
   ngOnChanges(): void {
-    this.applyFilters();
+    this.applyFilters(); // Applies filters when input filters change
   }
 
-  // Méthode pour charger les tâches depuis l'API
+  /**
+   * Loads tasks from the task service and assigns them to the appropriate columns.
+   */
   loadTasks(): void {
     this.tasksService.getTasks().subscribe((tasks: any[]) => {
-      this.columns.forEach(column => column.tasks = []); // Réinitialiser les colonnes
+      this.columns.forEach(column => column.tasks = []); // Reset columns to clear previous tasks
       tasks.forEach((task: any) => {
         if (task.stage >= 0 && task.stage < this.columns.length) {
-          this.columns[task.stage].tasks.push(task);
+          this.columns[task.stage].tasks.push(task); // Assign tasks to columns based on their stage
         } else {
           console.error(`Invalid stage value for task in loadTasks: ${task.id}`, task);
         }
       });
-      this.applyFilters();
-      this.cdr.detectChanges(); // Forcer la détection des changements
+      this.applyFilters(); // Apply filters after loading tasks
+      this.cdr.detectChanges(); // Trigger change detection to ensure the view is updated
     });
   }
 
+  /**
+   * Applies filters based on the current filters provided via input.
+   */
   applyFilters(): void {
     const { assignee, daysUntilDeadline } = this.filters;
     if (assignee) {
@@ -69,6 +77,7 @@ export class KanbanComponent implements OnInit, OnChanges {
         ))
       );
 
+      // Combine observables and filter tasks based on assignee and deadline
       forkJoin(userObservables).subscribe(tasksWithUsernames => {
         this.filteredColumns = this.columns.map(column => ({
           ...column,
@@ -79,7 +88,7 @@ export class KanbanComponent implements OnInit, OnChanges {
             return matchesAssignee && matchesDeadline;
           })
         }));
-        this.cdr.detectChanges(); // Forcer la détection des changements
+        this.cdr.detectChanges(); // Trigger change detection after filtering tasks
       });
     } else {
       this.filteredColumns = this.columns.map(column => ({
@@ -89,71 +98,86 @@ export class KanbanComponent implements OnInit, OnChanges {
           return matchesDeadline;
         })
       }));
-      this.cdr.detectChanges(); // Forcer la détection des changements
+      this.cdr.detectChanges(); // Trigger change detection after filtering tasks
     }
   }
-  
+
+  /**
+   * Calculates the number of days remaining until the task's deadline.
+   * @param deadline The task's deadline in string format (ISO).
+   * @returns The number of days remaining until the deadline.
+   */
   calculateDaysUntilDeadline(deadline: string): number {
     const deadlineDate = new Date(deadline);
     const timeDiff = deadlineDate.getTime() - new Date().getTime();
-    return Math.ceil(timeDiff / (1000 * 3600 * 24));
+    return Math.ceil(timeDiff / (1000 * 3600 * 24)); // Returns the number of days
   }
 
-  // Méthode pour supprimer une tâche
+  /**
+   * Deletes a task from the Kanban board.
+   * @param taskId The task's ID to be deleted.
+   */
   deleteTask(taskId: number): void {
     this.columns.forEach((column) => {
-      column.tasks = column.tasks.filter((task) => task.id !== taskId);
+      column.tasks = column.tasks.filter((task) => task.id !== taskId); // Remove task from all columns
     });
-    this.tasksService.notifyTaskUpdates(); // Notifier les mises à jour des tâches
+    this.tasksService.notifyTaskUpdates(); // Notify task updates to the service
   }
 
-  // Méthode pour mettre à jour une tâche
+  /**
+   * Updates a task in the Kanban board.
+   * @param updatedTask The task with updated information.
+   */
   updateTask(updatedTask: any): void {
     this.columns.forEach((column) => {
       const taskIndex = column.tasks.findIndex((task) => task.id === updatedTask.id);
       if (taskIndex !== -1) {
-        column.tasks.splice(taskIndex, 1);
+        column.tasks.splice(taskIndex, 1); // Remove the task from its current position
       }
     });
     if (updatedTask.stage >= 0 && updatedTask.stage < this.columns.length) {
-      this.columns[updatedTask.stage].tasks.push(updatedTask);
+      this.columns[updatedTask.stage].tasks.push(updatedTask); // Add task to the new column based on its updated stage
     } else {
       console.error(`Invalid stage value for task in updateTask: ${updatedTask.id}`, updatedTask);
     }
-    this.tasksService.notifyTaskUpdates(); // Notifier les mises à jour des tâches
+    this.tasksService.notifyTaskUpdates(); // Notify task updates to the service
   }
 
-  // Méthode pour gérer le drop et mettre à jour le stage de la tâche
+  /**
+   * Handles the drag-and-drop event for tasks between columns.
+   * @param event The drag-and-drop event.
+   * @param column The target column where the task is dropped.
+   */
   onDrop(event: CdkDragDrop<any[]>, column: any): void {
     const previousColumn = event.previousContainer.data;
     const currentColumn = column.tasks;
 
     if (event.previousContainer !== event.container) {
       const task = previousColumn.splice(event.previousIndex, 1)[0];
-      const newStage = this.columns.findIndex(col => col.title === column.title); // Calculer l'index de la colonne
+      const newStage = this.columns.findIndex(col => col.title === column.title); // Find the new column's index
       if (newStage >= 0 && newStage < this.columns.length) {
-        task.stage = newStage; // Mettre à jour le stage de la tâche
-        currentColumn.splice(event.currentIndex, 0, task);
+        task.stage = newStage; // Update the task's stage
+        currentColumn.splice(event.currentIndex, 0, task); // Add task to the new column
         this.tasksService.updateTask(task.id, task).subscribe(updatedTask => {
-          this.updateTask(updatedTask); // Mettre à jour l'interface utilisateur avec la tâche mise à jour
+          this.updateTask(updatedTask); // Update the task in the UI after it's moved
         });
       } else {
         console.error(`Invalid stage value for task: ${task.id}`, task);
       }
     } else {
       const task = currentColumn.splice(event.previousIndex, 1)[0];
-      currentColumn.splice(event.currentIndex, 0, task);
+      currentColumn.splice(event.currentIndex, 0, task); // Reorder task within the same column
     }
   }
 
-  // Ouvre le dialog pour ajouter une tâche
+  /**
+   * Opens a dialog to add a new task to the specified stage.
+   * @param stage The stage to which the task will be added.
+   */
   openAddTaskDialog(stage: number): void {
     const dialogRef = this.dialog.open(AddTaskComponent, {
       width: '400px',
-      data: { stage } // Passer la valeur de stage au composant AddTaskComponent
+      data: { stage } // Passes the stage information to the AddTaskComponent
     });
-
-
-    
   }
 }
